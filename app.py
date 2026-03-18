@@ -58,9 +58,13 @@ def build_command():
 def normalize_cookies_file():
     source = os.getenv("YTDLP_COOKIES_FILE")
     if not source:
-        local_cookie_json = Path(__file__).with_name("cookie.json")
-        if local_cookie_json.exists():
-            source = str(local_cookie_json)
+        local_cookie_txt = Path(__file__).with_name("cookies-www-youtube-com.txt")
+        if local_cookie_txt.exists():
+            source = str(local_cookie_txt)
+        else:
+            local_cookie_json = Path(__file__).with_name("cookie.json")
+            if local_cookie_json.exists():
+                source = str(local_cookie_json)
     if not source:
         return None
 
