@@ -1,12 +1,3 @@
-yt-dlp
-requests
-imageio-ffmpeg
-imageio
-python-dotenv
-openai
 Flask
-gunicorn
-convex
-google-auth-oauthlib
-google-auth
-google-api-python-client
+yt-dlp
+imageio-ffmpeg

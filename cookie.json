@@ -1,0 +1,17 @@
+[
+    {
+        "name": "ST-1knoxp7",
+        "value": "csn=5rI4eBMuYX6Wy5Tv&itct=COUBEMnZBiITCMLesY-cqJMDFSg5twAdOJMr1coBBNDyOYk%3D&endpoint=%7B%22clickTrackingParams%22%3A%22COUBEMnZBiITCMLesY-cqJMDFSg5twAdOJMr1coBBNDyOYk%3D%22%2C%22commandMetadata%22%3A%7B%22webCommandMetadata%22%3A%7B%22url%22%3A%22%2Fcreate_channel%3Fchannel_creation_token%3DKBM%25253D%22%2C%22webPageType%22%3A%22WEB_PAGE_TYPE_UNKNOWN%22%2C%22rootVe%22%3A83769%2C%22apiUrl%22%3A%22%2Fyoutubei%2Fv1%2Fchannel%2Fget_channel_creation_form%22%7D%7D%2C%22channelCreationFormEndpoint%22%3A%7B%22channelCreationToken%22%3A%22S0JNJTNE%22%2C%22source%22%3A%22TOPBAR_MENU_POPUP_CHANNEL_CREATION_SOURCE%22%7D%7D&session_logininfo=AFmmF2swRAIgZYaokGwmhnGdeVYVEtp8m8-VHzCjSd2VR8OT-8CaZ8QCIFAAK73BvibclcpzJGM1B40hr9ENNlsWBfNzWgJ4xpOr%3AQUQ3MjNmelJ6Um5kNlZSWnpUQUIyazNHM3FaNDU5R3FPNHB3Wl80YzFhOGpJR1BGd2wwT1Jmd0VYUktVdHpSekxYUVczV002UUxRdXN3VWQ1ZmFPZ2Y4RFpCRGhxQktZQy15QnYxTERxVDJ6bGFtZEZFUEhhYmluOHFjZmIzMXhpbURISkYwV3dzaDN5Z2s0dFYyc1IwLWxEUkZvVzM4TlJ3",
+        "domain": ".youtube.com",
+        "hostOnly": false,
+        "path": "/",
+        "secure": false,
+        "httpOnly": false,
+        "sameSite": null,
+        "session": false,
+        "firstPartyDomain": "",
+        "partitionKey": null,
+        "expirationDate": 1773794689,
+        "storeId": null
+    }
+]

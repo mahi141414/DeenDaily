@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: shorts-forge-web
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: CONVEX_URL
+        sync: false
+      - key: NVIDIA_API_KEY
+        sync: false
+      - key: YOUTUBE_TOKEN_JSON
+        sync: false
+      - key: FLASK_SECRET_KEY
+        sync: false
+      - key: WORKER_POLL_SECONDS
+        sync: false
