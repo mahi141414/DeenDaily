@@ -33,6 +33,15 @@ def get_ffmpeg_path():
         print(f"Error finding ffmpeg: {e}")
         sys.exit(1)
 
+def build_yt_dlp_base_command(ffmpeg_path):
+    command = ["yt-dlp", "--ffmpeg-location", ffmpeg_path, "--no-check-certificate"]
+
+    cookies_file = os.getenv("YTDLP_COOKIES_FILE")
+    if cookies_file and os.path.exists(cookies_file):
+        command.extend(["--cookies", cookies_file])
+
+    return command
+
 def download_video(url, ffmpeg_path):
     """Downloads video, subs, and metadata with high quality and compatible audio."""
     print(f"Processing URL: {url}")
@@ -65,15 +74,11 @@ def download_video(url, ffmpeg_path):
         print(f"Found existing video: {video_path}. Skipping download.")
     else:
         print("Downloading High Quality 1080p + Compatible Audio...")
-        command = [
-            "yt-dlp",
-            "--ffmpeg-location", ffmpeg_path,
+        command = build_yt_dlp_base_command(ffmpeg_path) + [
             "-f", "bestvideo[height=1080]+bestaudio[ext=m4a]/bestvideo[height=1080]+bestaudio/best",
             "--merge-output-format", "mp4",
             "--write-auto-sub", "--write-sub", "--sub-lang", "bn.*,en.*",
             "--extractor-args", "youtube:player-client=ios,android,web",
-            "--impersonate", "chrome",
-            "--no-check-certificate",
             "-o", f"{video_dir}/%(id)s.%(ext)s", url
         ]
         
@@ -81,8 +86,7 @@ def download_video(url, ffmpeg_path):
             subprocess.run(command, check=True)
         except subprocess.CalledProcessError:
             print("1080p failed. Falling back to best available...")
-            fallback_video_cmd = [
-                "yt-dlp", "--ffmpeg-location", ffmpeg_path,
+            fallback_video_cmd = build_yt_dlp_base_command(ffmpeg_path) + [
                 "-f", "bestvideo+bestaudio/best", "--merge-output-format", "mp4",
                 "-o", f"{video_dir}/%(id)s.%(ext)s", url
             ]
@@ -100,10 +104,10 @@ def download_video(url, ffmpeg_path):
     
     if not sub_files:
         print("Subtitles missing. Attempting fallback transcript pull...")
-        fallback_cmd = [
-            "yt-dlp", "--skip-download", "--write-auto-sub", "--sub-lang", "bn.*,en.*",
+        fallback_cmd = build_yt_dlp_base_command(ffmpeg_path) + [
+            "--skip-download", "--write-auto-sub", "--sub-lang", "bn.*,en.*",
             "--extractor-args", "youtube:player-client=android,ios",
-            "--impersonate", "chrome", "-o", f"{video_dir}/%(id)s.%(ext)s", url
+            "-o", f"{video_dir}/%(id)s.%(ext)s", url
         ]
         subprocess.run(fallback_cmd)
         sub_files = glob.glob(f"{sub_path_base}*.srt") + glob.glob(f"{sub_path_base}*.vtt")
