@@ -66,10 +66,15 @@ Then copy the JSON contents into the `YOUTUBE_TOKEN_JSON` Render secret.
 
 ## Render deployment
 
-Render should run this as two services:
+Render should run this as one web service for this hosted setup.
 
-- Web service: `gunicorn app:app --bind 0.0.0.0:$PORT`
-- Worker service: `python worker.py`
+Start command:
+
+```bash
+bash -lc "python worker.py & exec gunicorn app:app --bind 0.0.0.0:$PORT"
+```
+
+That single service serves the site and runs the background worker in the same container.
 
 Use the values in `render.yaml` as a starting point.
 
