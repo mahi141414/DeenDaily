@@ -71,10 +71,10 @@ Render should run this as one web service for this hosted setup.
 Start command:
 
 ```bash
-bash -lc "python worker.py & exec gunicorn app:app --bind 0.0.0.0:$PORT"
+gunicorn app:app --bind 0.0.0.0:$PORT
 ```
 
-That single service serves the site and runs the background worker in the same container.
+The Flask app starts the background worker thread on boot, so the same service serves the site and processes jobs.
 
 Use the values in `render.yaml` as a starting point.
 

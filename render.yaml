@@ -3,7 +3,7 @@ services:
     name: shorts-forge-web
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: bash -lc "python worker.py & exec gunicorn app:app --bind 0.0.0.0:$PORT"
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     envVars:
       - key: CONVEX_URL
         sync: false

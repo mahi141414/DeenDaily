@@ -1,9 +1,12 @@
 import os
+import threading
 from datetime import datetime
 
 from convex import ConvexClient
 from dotenv import load_dotenv
 from flask import Flask, jsonify, redirect, render_template, request, flash, url_for
+
+from worker import run_worker
 
 load_dotenv()
 
@@ -13,11 +16,33 @@ SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "codec-secret-key")
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
+_worker_started = False
+_worker_lock = threading.Lock()
+
 
 def get_convex_client() -> ConvexClient:
     if not CONVEX_URL:
         raise RuntimeError("CONVEX_URL is not set")
     return ConvexClient(CONVEX_URL)
+
+
+def start_background_worker_once():
+    global _worker_started
+
+    if os.getenv("ENABLE_BACKGROUND_WORKER", "1") != "1":
+        return
+
+    with _worker_lock:
+        if _worker_started:
+            return
+
+        _worker_started = True
+        thread = threading.Thread(target=run_worker, daemon=True, name="queue-worker")
+        thread.start()
+        print("Background worker thread started.")
+
+
+start_background_worker_once()
 
 
 def format_timestamp(value):
