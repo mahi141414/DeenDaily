@@ -1,0 +1,12 @@
+{
+  "name": "codec-convex-backend",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "convex": "^1.22.0"
+  },
+  "scripts": {
+    "convex:dev": "convex dev",
+    "convex:deploy": "convex deploy"
+  }
+}

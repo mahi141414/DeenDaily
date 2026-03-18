@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shorts Forge</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="backdrop"></div>
+  <main class="shell">
+    <section class="hero card">
+      <div>
+        <p class="eyebrow">Render + Convex + YouTube Shorts</p>
+        <h1>Queue a video, close the tab, come back later to uploads.</h1>
+        <p class="lede">
+          Paste a YouTube URL and the worker will split it into shorts, upload them automatically, and retry blocked uploads one hour later.
+        </p>
+      </div>
+      <div class="status-panel">
+        <div class="status-pill">Persistent queue in Convex</div>
+        <div class="status-note">State survives Render restarts.</div>
+      </div>
+    </section>
+
+    <section class="card form-card">
+      <form action="/jobs" method="post" class="queue-form">
+        <label for="source_url">YouTube video URL</label>
+        <div class="input-row">
+          <input id="source_url" name="source_url" type="url" placeholder="https://www.youtube.com/watch?v=..." required />
+          <button type="submit">Queue job</button>
+        </div>
+      </form>
+      <div class="helper-grid">
+        <div>
+          <h3>What happens</h3>
+          <p>The worker fetches subtitles, finds 10 shorts, cuts them, uploads them, and updates the queue as it goes.</p>
+        </div>
+        <div>
+          <h3>Retry logic</h3>
+          <p>If YouTube blocks uploads with <span>uploadLimitExceeded</span>, the job waits one hour and resumes from the last saved segment.</p>
+        </div>
+      </div>
+      {% if config_error %}
+      <div class="alert error">Configuration error: {{ config_error }}</div>
+      {% endif %}
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+          {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+    </section>
+
+    <section class="card jobs-card">
+      <div class="card-head">
+        <div>
+          <p class="eyebrow">Job queue</p>
+          <h2>Current jobs</h2>
+        </div>
+        <button class="ghost" id="refresh-button" type="button">Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th>URL</th>
+              <th>Progress</th>
+              <th>Retry At</th>
+              <th>Last Error</th>
+              <th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="jobs-body">
+            {% for job in jobs %}
+            <tr>
+              <td><span class="badge badge-{{ job.status }}">{{ job.status }}</span></td>
+              <td class="url-cell">{{ job.sourceUrl }}</td>
+              <td>{{ job.uploadedCount }}/{{ job.totalSegments or 0 }}</td>
+              <td>{{ job.retryAt }}</td>
+              <td class="error-cell">{{ job.lastError }}</td>
+              <td>{{ job.updatedAt }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const refreshButton = document.getElementById('refresh-button');
+    const jobsBody = document.getElementById('jobs-body');
+
+    function badgeClass(status) {
+      return `badge-${status || 'queued'}`;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function renderJobs(jobs) {
+      if (!jobs.length) {
+        jobsBody.innerHTML = '<tr><td colspan="6" class="empty-row">No jobs yet. Queue one above.</td></tr>';
+        return;
+      }
+
+      jobsBody.innerHTML = jobs.map(job => `
+        <tr>
+          <td><span class="badge ${badgeClass(job.status)}">${escapeHtml(job.status)}</span></td>
+          <td class="url-cell">${escapeHtml(job.sourceUrl)}</td>
+          <td>${escapeHtml(job.uploadedCount)}/${escapeHtml(job.totalSegments || 0)}</td>
+          <td>${escapeHtml(job.retryAt || '-')}</td>
+          <td class="error-cell">${escapeHtml(job.lastError || '')}</td>
+          <td>${escapeHtml(job.updatedAt || '')}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function refreshJobs() {
+      try {
+        const response = await fetch('/api/jobs');
+        const data = await response.json();
+        renderJobs(data.jobs || []);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    refreshButton?.addEventListener('click', refreshJobs);
+    setInterval(refreshJobs, 30000);
+  </script>
+</body>
+</html>
